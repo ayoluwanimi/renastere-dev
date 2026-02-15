@@ -599,6 +599,35 @@ export function Admin() {
                                 aspectRatio="aspect-square"
                               />
 
+                              {/* Add Project from Link for Team Member */}
+                              <div className="p-4 bg-[#0f3460] rounded-lg border border-[#e94560]/30">
+                                <h4 className="text-white font-semibold mb-3 flex items-center gap-2">
+                                  <Plus size={16} />
+                                  Add Project from Link
+                                </h4>
+                                <p className="text-gray-400 text-xs mb-3">Add a project to {member.name}'s portfolio by pasting a website URL</p>
+                                <ProjectLinkImport 
+                                  onProjectAdded={(project) => {
+                                    const newProjectId = project.id || Date.now().toString();
+                                    addProject({
+                                      id: newProjectId,
+                                      title: project.title,
+                                      description: project.description,
+                                      image: project.image_url,
+                                      technologies: project.technologies,
+                                      link: project.project_link,
+                                      category: project.category
+                                    });
+                                    // Auto-assign to this team member
+                                    const projectsInput = document.getElementById(`projects-${member.id}`) as HTMLInputElement;
+                                    const currentProjects = projectsInput.value.split(',').map(p => p.trim()).filter(Boolean);
+                                    projectsInput.value = [...currentProjects, newProjectId].join(', ');
+                                    showSaveMessage();
+                                  }}
+                                  existingProjects={content.projects}
+                                />
+                              </div>
+
                               <div>
                                 <label className="block text-gray-400 text-sm mb-2">Assigned Project IDs (comma separated)</label>
                                 <input
