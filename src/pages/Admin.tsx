@@ -536,6 +536,37 @@ export function Admin() {
                 <div className="space-y-6">
                   <h2 className="text-2xl font-bold text-white">Team Members</h2>
                   
+                  {/* Add Project from Link Section */}
+                  <div className="p-6 bg-gradient-to-br from-[#0f3460] to-[#16213e] rounded-xl border border-[#e94560]/30">
+                    <div className="mb-4">
+                      <h3 className="text-lg font-semibold text-white flex items-center gap-2 mb-2">
+                        <Plus size={18} />
+                        Add Project from Link
+                      </h3>
+                      <p className="text-gray-400 text-sm">Paste a website URL to automatically fetch project information</p>
+                    </div>
+                    <ProjectLinkImport 
+                      onProjectAdded={(project) => {
+                        addProject({
+                          id: project.id || Date.now().toString(),
+                          title: project.title,
+                          description: project.description,
+                          image: project.image_url,
+                          technologies: project.technologies,
+                          link: project.project_link,
+                          category: project.category
+                        });
+                        showSaveMessage();
+                      }}
+                      existingProjects={content.projects}
+                    />
+                  </div>
+
+                  {/* Team Members List */}
+                  <div className="mt-8">
+                    <h3 className="text-lg font-semibold text-white mb-4">Team Members</h3>
+                  </div>
+                  
                   {content.team.map((member) => (
                     <div key={member.id} className="p-6 bg-[#0f3460] rounded-xl">
                       <div className="flex flex-col md:flex-row items-start gap-6">
