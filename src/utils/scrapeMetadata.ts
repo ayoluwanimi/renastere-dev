@@ -14,19 +14,26 @@ export interface ScrapedMetadata {
 export async function scrapeWebsiteMetadata(url: string): Promise<ScrapedMetadata> {
   try {
     // Validate URL
-    const urlObj = new URL(url);
+    let urlToFetch = url;
     
-    // Use a CORS proxy or fetch directly
-    // For production, you might want to use a service like:
-    // - https://www.linkpreview.net/
-    // - https://microlink.io/
-    // - Your own backend endpoint
+    // Add https:// if no protocol specified
+    if (!urlToFetch.startsWith('http://') && !urlToFetch.startsWith('https://')) {
+      urlToFetch = 'https://' + urlToFetch;
+    }
     
-    const response = await fetch(`https://api.microlink.io?url=${encodeURIComponent(url)}`);
+    const urlObj = new URL(urlToFetch);
+    
+    console.log('Scraping URL:', urlToFetch);
+    
+    const response = await fetch(`https://api.microlink.io?url=${encodeURIComponent(urlToFetch)}`);
     const data = await response.json();
     
-    if (!data.data) {
-      throw new Error('Unable to fetch metadata');
+    console.log('Microlink response status:', data.status);
+    console.log('Microlink response data:', data.data);
+    
+    if (!data.data || data.status !== 'success') {
+      console.warn('No data returned from API');
+      throw new Error('Unable to fetch metadata from the URL');
     }
 
     const metadata = data.data;
@@ -34,24 +41,19 @@ export async function scrapeWebsiteMetadata(url: string): Promise<ScrapedMetadat
     // Extract technologies from the page (common patterns)
     const technologies = extractTechnologies(metadata);
 
-    return {
+    const result = {
       title: metadata.title || 'Untitled Project',
       description: metadata.description || 'Project website',
       image: metadata.image?.url || metadata.logo?.url || 'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=600',
       technologies,
-      link: url,
+      link: urlToFetch,
     };
+    
+    console.log('Final metadata result:', result);
+    return result;
   } catch (error) {
     console.error('Error scraping metadata:', error);
-    
-    // Fallback: Return minimal data
-    return {
-      title: 'Project Website',
-      description: 'Website added from link',
-      image: 'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=600',
-      technologies: [],
-      link: url,
-    };
+    throw error; // Throw error so component can handle it
   }
 }
 

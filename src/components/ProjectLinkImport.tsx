@@ -33,7 +33,16 @@ export function ProjectLinkImport({ onProjectAdded, existingProjects }: ProjectL
     setSuccess('');
     
     try {
+      console.log('Fetching metadata for URL:', url);
       const metadata = await scrapeWebsiteMetadata(url);
+      console.log('Metadata received:', metadata);
+      
+      if (!metadata.title && metadata.title === 'Project Website') {
+        setError('Could not fetch website information. The URL might not have proper metadata. Please try another URL or fill in the details manually.');
+        setPreviewProject(null);
+        setLoading(false);
+        return;
+      }
       
       const newProject: Partial<Project> = {
         id: Date.now().toString(),
@@ -45,10 +54,12 @@ export function ProjectLinkImport({ onProjectAdded, existingProjects }: ProjectL
         category: 'Web Development', // Default category
       };
 
+      console.log('Project preview:', newProject);
       setPreviewProject(newProject);
       setFormData(newProject);
       setSuccess('Website information fetched successfully! Review and adjust below.');
     } catch (err) {
+      console.error('Error in handleFetchMetadata:', err);
       setError(`Error fetching website information: ${err instanceof Error ? err.message : 'Unknown error'}`);
       setPreviewProject(null);
     } finally {
