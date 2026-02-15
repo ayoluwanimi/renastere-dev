@@ -8,6 +8,7 @@ import { useAuth } from '../context/AuthContext';
 import { useContent } from '../context/ContentContext';
 import { Project, Service } from '../types';
 import { ImageUpload } from '../components/ImageUpload';
+import { ProjectLinkImport } from '../components/ProjectLinkImport';
 
 type Tab = 'hero' | 'about' | 'services' | 'projects' | 'team' | 'contact' | 'footer' | 'images';
 
@@ -410,6 +411,12 @@ export function Admin() {
                       Add Project
                     </button>
                   </div>
+
+                  {/* Project Link Import */}
+                  <ProjectLinkImport 
+                    onProjectAdded={handleSaveProject}
+                    existingProjects={content.projects}
+                  />
 
                   {editingProject && (
                     <div className="p-6 bg-[#0f3460] rounded-xl border border-gray-600">
